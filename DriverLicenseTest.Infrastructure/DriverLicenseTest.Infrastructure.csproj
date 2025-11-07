@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DriverLicenseTest.Domain\DriverLicenseTest.Domain.csproj" />
-    <ProjectReference Include="..\DriverLicenseTest.Application\DriverLicenseTest.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

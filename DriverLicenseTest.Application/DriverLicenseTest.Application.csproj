@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DriverLicenseTest.Domain\DriverLicenseTest.Domain.csproj" />
+    <ProjectReference Include="..\DriverLicenseTest.Infrastructure\DriverLicenseTest.Infrastructure.csproj" />
     <ProjectReference Include="..\DriverLicenseTest.Shared\DriverLicenseTest.Shared.csproj" />
   </ItemGroup>
 
