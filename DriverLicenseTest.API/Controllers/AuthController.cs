@@ -108,7 +108,11 @@ public class AuthController : ControllerBase
             return Unauthorized(new MessageResponse { Message = "Invalid credentials." });
 
         var jwt = CreateAuthToken(user);
-        return Ok(new TokenResponse { Token = jwt });
+        return Ok(new LoginResponse {
+            Phone = user.PhoneNumber,
+            UserId = user.Id,
+            Email = user.Email!,
+            Token = jwt });
     }
 
     private string CreateEmailToken(string userId, TimeSpan lifetime)
@@ -169,6 +173,11 @@ public class AuthController : ControllerBase
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    private sealed class TokenResponse { public string Token { get; set; } = string.Empty; }
+    private sealed class LoginResponse { 
+        public string Token { get; set; } = string.Empty; 
+        public string Phone { get; set; }
+        public string UserId { get; set; }
+        public string Email { get; set; }
+    }
     private sealed class MessageResponse { public string Message { get; set; } = string.Empty; }
 }
