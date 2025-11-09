@@ -6,7 +6,7 @@ namespace DriverLicenseTest.Application.Services.Interfaces;
 public interface IMockExamService
 {
     Task<ApiResponse<MockExamDto>> StartMockExamAsync(string userId, string licenseType);
-
     Task<ApiResponse<MockExamDto>> GetMockExamAsync(int examId);
     Task<ApiResponse<MockExamDto>> SubmitMockExamAsync(int examId);
+    Task<ApiResponse<IEnumerable<MockExamDto>>> GetMockExamAsyncByUserIdAnfLicenseType(string userId, int licenseTypeId);
 }

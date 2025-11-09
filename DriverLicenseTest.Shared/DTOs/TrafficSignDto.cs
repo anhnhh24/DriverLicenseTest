@@ -29,7 +29,7 @@ public class TrafficSignDto
     {
         return signType switch
         {
-            "Prohibition" => "Biển cấm",
+            "Prohibitive" => "Biển cấm",
             "Warning" => "Biển cảnh báo",
             "Mandatory" => "Biển hiệu lệnh",
             "Information" => "Biển chỉ dẫn",

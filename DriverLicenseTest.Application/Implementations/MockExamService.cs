@@ -301,6 +301,39 @@ public class MockExamService : IMockExamService
     /// <summary>
     /// Private method: Update user statistics after exam
     /// </summary>
+    /// 
+    public async Task<ApiResponse<IEnumerable<MockExamDto>>> GetMockExamAsyncByUserIdAnfLicenseType(string userId, int licenseTypeId)
+    {
+        try
+        {
+            var mockExam = await _unitOfWork.MockExams.GetListAsync(
+                filter: m => m.UserId == userId && m.LicenseType.LicenseTypeId == licenseTypeId);
+            if (mockExam.Count() == 0)
+                return ApiResponse<IEnumerable<MockExamDto>>.ErrorResponse("Mock exam not found");
+            List<MockExamDto> examDto = mockExam.Select(me => new MockExamDto
+            {
+                ExamId = me.ExamId,
+                UserId = me.UserId,
+                LicenseTypeId = me.LicenseTypeId,
+                LicenseTypeName = me.LicenseType?.LicenseName ?? string.Empty,
+                TotalQuestions = me.TotalQuestions,
+                CorrectAnswers = me.CorrectAnswers,
+                WrongAnswers = me.WrongAnswers,
+                PassingScore = me.PassingScore,
+                PassStatus = me.PassStatus,
+                IsSubmitted = me.IsSubmitted,
+                TimeSpent = me.TimeSpent ?? 0,
+                StartedAt = me.StartedAt,
+                CompletedAt = me.CompletedAt,
+                CreatedAt = me.CreatedAt
+            }).ToList();
+            return ApiResponse<IEnumerable<MockExamDto>>.SuccessResponse(examDto);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<IEnumerable<MockExamDto>>.ErrorResponse(ex.Message);
+        }
+    }
     private async Task UpdateUserStatisticsAsync(string userId, bool isPassed)
     {
         var statistic = await _unitOfWork.UserStatistics.GetOneAsync(

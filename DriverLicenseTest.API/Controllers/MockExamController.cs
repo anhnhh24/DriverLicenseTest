@@ -55,4 +55,13 @@ public class MockExamsController : ControllerBase
         var result = await _mockExamService.SubmitMockExamAsync(examId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
+
+    [HttpGet("byuser")]
+    public async Task<IActionResult> GetMockExamByUserIdAndLicenseType([FromQuery] string userId, [FromQuery] int licenseType)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+            return BadRequest(ApiResponse<MockExamDto>.ErrorResponse("userId and licenseType are required"));
+        var result = await _mockExamService.GetMockExamAsyncByUserIdAnfLicenseType(userId, licenseType);
+        return result.Success ? Ok(result) : NotFound(result);
+    }
 }
