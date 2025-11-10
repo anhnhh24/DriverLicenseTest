@@ -24,13 +24,10 @@ public class QuestionService : IQuestionService
     {
         try
         {
-            // Validate
-            totalQuestions = Math.Max(1, Math.Min(totalQuestions, 100)); // Max 100
-
-            // Get all elimination questions with answer options (fixed: call repository method with filter/include,
-            // do not await then try to compose EF query on the result)
+            // Get all elimination questions with answer options and category
             var eliminationQuestionsEnumerable = await _unitOfWork.Questions.GetListAsync(
                 filter: q => q.IsElimination == true,
+                orderBy: q => q.OrderBy(x => x.QuestionNumber),
                 include: q => q.Include(x => x.AnswerOptions).Include(x => x.Category)
             );
 
@@ -39,19 +36,8 @@ public class QuestionService : IQuestionService
             if (!eliminationQuestions.Any())
                 return ApiResponse<List<QuestionDto>>.ErrorResponse("No elimination questions available");
 
-            if (eliminationQuestions.Count < totalQuestions)
-            {
-                return ApiResponse<List<QuestionDto>>.ErrorResponse(
-                    $"Only {eliminationQuestions.Count} elimination questions available, requested {totalQuestions}");
-            }
-
-            // Get random questions
-            var randomQuestions = eliminationQuestions
-                .OrderBy(x => Guid.NewGuid())
-                .Take(totalQuestions)
-                .ToList();
-
-            var questionDtos = _mapper.Map<List<QuestionDto>>(randomQuestions);
+            // Return all elimination questions (no random, no limit)
+            var questionDtos = _mapper.Map<List<QuestionDto>>(eliminationQuestions);
 
             return ApiResponse<List<QuestionDto>>.SuccessResponse(questionDtos);
         }

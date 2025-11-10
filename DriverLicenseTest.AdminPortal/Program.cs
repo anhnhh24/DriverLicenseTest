@@ -9,11 +9,7 @@ using DriverLicenseTest.Application.Mappings;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddRazorPages(options =>
-{
-// Set Admin/Index as default page
-    options.Conventions.AddPageRoute("/Admin/Users/Index", "");
-});
+builder.Services.AddRazorPages();
 
 // Database Context
 builder.Services.AddDbContext<DriverLicenseTestContext>(options =>
