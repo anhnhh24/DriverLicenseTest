@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DriverLicenseTest.API\DriverLicenseTest.API.csproj" />
+    <ProjectReference Include="..\DriverLicenseTest.Application\DriverLicenseTest.Application.csproj" />
+    <ProjectReference Include="..\DriverLicenseTest.Domain\DriverLicenseTest.Domain.csproj" />
+    <ProjectReference Include="..\DriverLicenseTest.Shared\DriverLicenseTest.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

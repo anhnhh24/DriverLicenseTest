@@ -1,0 +1,228 @@
+@page
+@model AdminApp.Pages.Questions.IndexModel
+@{
+    ViewData["Title"] = "Qu?n Lý Câu H?i";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Qu?n Lý Câu H?i</h2>
+  <a asp-page="Create" class="btn btn-primary">
+      <i class="fas fa-plus"></i> Thêm Câu H?i M?i
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+      @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+          <form method="get">
+    <div class="row g-3">
+    <div class="col-md-6">
+              <input type="text" name="SearchString" value="@Model.SearchString"
+   class="form-control" placeholder="Tìm ki?m câu h?i...">
+  </div>
+      <div class="col-md-3">
+     <button type="submit" class="btn btn-primary">
+       <i class="fas fa-search"></i> Tìm Ki?m
+  </button>
+        <a asp-page="Index" class="btn btn-secondary">
+          <i class="fas fa-redo"></i> Reset
+        </a>
+    </div>
+        </div>
+    </form>
+   </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+     <div class="col-md-4">
+         <div class="card bg-primary text-white">
+        <div class="card-body">
+       <h5><i class="fas fa-list"></i> T?ng s? câu h?i</h5>
+ <h2>@Model.TotalCount</h2>
+       </div>
+            </div>
+        </div>
+  <div class="col-md-4">
+     <div class="card bg-info text-white">
+       <div class="card-body">
+                    <h5><i class="fas fa-file"></i> Trang hi?n t?i</h5>
+       <h2>@Model.PageNumber / @Model.TotalPages</h2>
+          </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+     <div class="card-body">
+            <h5><i class="fas fa-check"></i> S? câu/trang</h5>
+  <h2>@Model.PageSize</h2>
+          </div>
+     </div>
+        </div>
+    </div>
+
+    <!-- Questions Table -->
+    <div class="card">
+        <div class="card-body">
+         <div class="table-responsive">
+             <table class="table table-hover">
+          <thead class="table-light">
+    <tr>
+           <th>S? TT</th>
+     <th>Câu H?i</th>
+    <th>Danh M?c</th>
+      <th>?? Khó</th>
+                 <th>?i?m Li?t</th>
+    <th>Thao Tác</th>
+       </tr>
+                 </thead>
+    <tbody>
+  @foreach (var question in Model.Questions)
+      {
+          <tr>
+  <td><strong>#@question.QuestionNumber</strong></td>
+  <td>
+  <div class="text-truncate" style="max-width: 400px;">
+               @question.QuestionText
+    </div>
+         </td>
+       <td>
+         <span class="badge bg-info">@question.CategoryName</span>
+       </td>
+            <td>
+     @if (question.DifficultyLevel == "Easy")
+ {
+               <span class="badge bg-success">D?</span>
+                 }
+  else if (question.DifficultyLevel == "Medium")
+      {
+ <span class="badge bg-warning">Trung Bình</span>
+        }
+    else
+    {
+     <span class="badge bg-danger">Khó</span>
+      }
+               </td>
+  <td>
+         @if (question.IsElimination)
+   {
+      <span class="badge bg-danger">
+      <i class="fas fa-exclamation-triangle"></i> Có
+  </span>
+    }
+      else
+     {
+            <span class="badge bg-secondary">Không</span>
+      }
+             </td>
+            <td>
+            <a asp-page="Details" asp-route-id="@question.QuestionId"
+   class="btn btn-sm btn-info" title="Chi ti?t">
+   <i class="fas fa-eye"></i>
+     </a>
+        <a asp-page="Edit" asp-route-id="@question.QuestionId"
+         class="btn btn-sm btn-warning" title="Ch?nh s?a">
+    <i class="fas fa-edit"></i>
+          </a>
+        <a asp-page="Delete" asp-route-id="@question.QuestionId"
+          class="btn btn-sm btn-danger" title="Xóa">
+          <i class="fas fa-trash"></i>
+  </a>
+              </td>
+     </tr>
+   }
+         </tbody>
+         </table>
+            </div>
+
+        @if (!Model.Questions.Any())
+    {
+            <div class="alert alert-info text-center">
+      Không tìm th?y câu h?i nào.
+        </div>
+   }
+
+            <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+       {
+      <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+      <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+  <a class="page-link" asp-page="Index"
+    asp-route-pageNumber="@(Model.PageNumber - 1)"
+ asp-route-searchString="@Model.SearchString">
+                    <i class="fas fa-chevron-left"></i> Tr??c
+   </a>
+                 </li>
+
+      @{
+            var startPage = Math.Max(1, Model.PageNumber - 2);
+ var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+     }
+
+  @if (startPage > 1)
+  {
+          <li class="page-item">
+    <a class="page-link" asp-page="Index" asp-route-pageNumber="1"
+        asp-route-searchString="@Model.SearchString">1</a>
+             </li>
+        @if (startPage > 2)
+     {
+           <li class="page-item disabled">
+      <span class="page-link">...</span>
+         </li>
+          }
+  }
+
+                  @for (int i = startPage; i <= endPage; i++)
+            {
+       <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+         <a class="page-link" asp-page="Index"
+  asp-route-pageNumber="@i"
+     asp-route-searchString="@Model.SearchString">@i</a>
+                 </li>
+     }
+
+     @if (endPage < Model.TotalPages)
+   {
+        @if (endPage < Model.TotalPages - 1)
+      {
+   <li class="page-item disabled">
+        <span class="page-link">...</span>
+        </li>
+      }
+                <li class="page-item">
+<a class="page-link" asp-page="Index"
+    asp-route-pageNumber="@Model.TotalPages"
+                asp-route-searchString="@Model.SearchString">@Model.TotalPages</a>
+        </li>
+    }
+
+          <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+           <a class="page-link" asp-page="Index"
+             asp-route-pageNumber="@(Model.PageNumber + 1)"
+       asp-route-searchString="@Model.SearchString">
+   Sau <i class="fas fa-chevron-right"></i>
+        </a>
+        </li>
+  </ul>
+     <div class="text-center text-muted">
+             Hi?n th? câu h?i @((Model.PageNumber - 1) * Model.PageSize + 1) 
+  ??n @(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount)) 
+ trong t?ng s? @Model.TotalCount câu h?i
+     </div>
+    </nav>
+            }
+        </div>
+    </div>
+</div>

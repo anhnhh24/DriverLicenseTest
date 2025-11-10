@@ -1,0 +1,75 @@
+﻿@page
+@model AdminApp.Pages.Admin.LicenseTypes.IndexModel
+@{  
+    ViewData["Title"] = "Quản Lý Loại Bằng Lái";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Quản Lý Loại Bằng Lái</h2>
+        <a asp-page="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm Loại Bằng Mới
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã Bằng</th>
+                            <th>Tên Bằng Lái</th>
+                            <th>Loại Xe</th>
+                            <th>Tổng Câu</th>
+                            <th>Thời Gian (phút)</th>
+                            <th>Điểm Đạt</th>
+                            <th>Câu Liệt</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var license in Model.LicenseTypes)
+                        {
+                            <tr>
+                                <td><strong>@license.LicenseCode</strong></td>
+                                <td>@license.LicenseName</td>
+                                <td>@(license.VehicleType ?? "N/A")</td>
+                                <td><span class="badge bg-primary">@license.TotalQuestions</span></td>
+                                <td><span class="badge bg-info">@license.TimeLimit phút</span></td>
+                                <td><span class="badge bg-success">@license.PassingScore điểm</span></td>
+                                <td><span class="badge bg-danger">@(license.RequiredElimination ?? 0)</span></td>
+                                <td>
+                                    <a asp-page="Edit" asp-route-id="@license.LicenseTypeId" 
+                                       class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-page="Delete" asp-route-id="@license.LicenseTypeId" 
+                                       class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (!Model.LicenseTypes.Any())
+            {
+                <div class="alert alert-info text-center">
+                    Chưa có loại bằng lái nào.
+                </div>
+            }
+        </div>
+    </div>
+</div>

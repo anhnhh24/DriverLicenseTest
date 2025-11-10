@@ -1,0 +1,75 @@
+﻿
+@model AdminApp.Pages.Admin.Users.DetailsModel
+@{
+    ViewData["Title"] = "Chi Tiết Người Dùng";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h4>Thông Tin Chi Tiết Người Dùng</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.User.Email</dd>
+
+                        <dt class="col-sm-4">Họ tên:</dt>
+                        <dd class="col-sm-8"><strong>@(Model.User.FullName ?? "N/A")</strong></dd>
+
+                        <dt class="col-sm-4">Số điện thoại:</dt>
+                        <dd class="col-sm-8">@(Model.User.PhoneNumber ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">Ngày đăng ký:</dt>
+                        <dd class="col-sm-8">@Model.User.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4">Trạng thái:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.User.LockoutEnabled && Model.User.LockoutEnd > DateTimeOffset.Now)
+                            {
+                                <span class="badge bg-danger">Bị khóa đến @Model.User.LockoutEnd?.ToString("dd/MM/yyyy HH:mm")</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Hoạt động</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    @if (Model.Statistics != null)
+                    {
+                        <h5>Thống Kê Luyện Tập</h5>
+                        <dl class="row">
+                            <dt class="col-sm-6">Tổng số bài thi:</dt>
+                            <dd class="col-sm-6"><span class="badge bg-primary">@Model.Statistics.TotalExamsTaken</span></dd>
+
+                            <dt class="col-sm-6">Số bài đạt:</dt>
+                            <dd class="col-sm-6"><span class="badge bg-success">@Model.Statistics.TotalExamsPassed</span></dd>
+
+                            <dt class="col-sm-6">Tỷ lệ đạt:</dt>
+                            <dd class="col-sm-6">
+                                <span class="badge bg-info">
+                                    @(Model.Statistics.TotalExamsTaken > 0 ? 
+                                        ((double)Model.Statistics.TotalExamsPassed / Model.Statistics.TotalExamsFailed * 100).ToString("F1") : "0")%
+                                </span>
+                            </dd>
+
+                            <dt class="col-sm-6">Điểm trung bình:</dt>
+                            <dd class="col-sm-6"><span class="badge bg-warning">@Model.Statistics.AverageScore.ToString("F1")</span></dd>
+                        </dl>
+                    }
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-page="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay Lại
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

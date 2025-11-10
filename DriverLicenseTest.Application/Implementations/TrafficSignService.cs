@@ -19,21 +19,22 @@ public class TrafficSignService : ITrafficSignService
     {
         try
         {
-            // Get all active signs (NO include Category)
-            var signsEnumerable = await _unitOfWork.TrafficSigns.GetListAsync(
-                filter: s => s.IsActive);
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, Math.Min(pageSize, 100));
 
-            var signs = signsEnumerable
-                .OrderBy(s => s.SignCode)
-                .ToList();
+            // OPTIMIZED: Get total count first
+            var totalCount = await _unitOfWork.TrafficSigns.GetCount(s => s.IsActive);
 
-            var totalCount = signs.Count;
-            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            // OPTIMIZED: Get paginated data directly from database
+            var signs = await _unitOfWork.TrafficSigns.GetListAsync(
+                filter: s => s.IsActive,
+                orderBy: q => q.OrderBy(s => s.SignCode),
+                pageSize: pageSize,
+                pageNumber: pageNumber
+             );
 
-            var paginatedSigns = signs
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .Select(s => new TrafficSignDto
+            // OPTIMIZED: Map directly without ToList() first
+            var signDtos = signs.Select(s => new TrafficSignDto
                 {
                     SignId = s.SignId,
                     SignCode = s.SignCode,
@@ -44,16 +45,15 @@ public class TrafficSignService : ITrafficSignService
                     Meaning = s.Meaning,
                     RelatedQuestionCount = s.RelatedQuestionCount,
                     IsActive = s.IsActive
-                })
-                .ToList();
+                }).ToList();
 
             var pagedResult = new PagedResult<TrafficSignDto>
             {
-                Items = paginatedSigns,
+                Items = signDtos,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalPages = totalPages
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
             };
 
             return ApiResponse<PagedResult<TrafficSignDto>>.SuccessResponse(pagedResult);
@@ -98,12 +98,14 @@ public class TrafficSignService : ITrafficSignService
     {
         try
         {
-            var signsEnumerable = await _unitOfWork.TrafficSigns.GetListAsync(
-                filter: s => s.SignType == signType && s.IsActive);
+            // OPTIMIZED: Filter at database level
+            var signs = await _unitOfWork.TrafficSigns.GetListAsync(
+                filter: s => s.SignType == signType && s.IsActive,
+                orderBy: q => q.OrderBy(s => s.SignCode)
+             );
 
-            var signs = signsEnumerable
-                .OrderBy(s => s.SignCode)
-                .Select(s => new TrafficSignDto
+            // OPTIMIZED: Map directly
+            var signDtos = signs.Select(s => new TrafficSignDto
                 {
                     SignId = s.SignId,
                     SignCode = s.SignCode,
@@ -114,10 +116,9 @@ public class TrafficSignService : ITrafficSignService
                     Meaning = s.Meaning,
                     RelatedQuestionCount = s.RelatedQuestionCount,
                     IsActive = s.IsActive
-                })
-                .ToList();
+                }).ToList();
 
-            return ApiResponse<List<TrafficSignDto>>.SuccessResponse(signs);
+            return ApiResponse<List<TrafficSignDto>>.SuccessResponse(signDtos);
         }
         catch (Exception ex)
         {
@@ -132,12 +133,14 @@ public class TrafficSignService : ITrafficSignService
             if (string.IsNullOrWhiteSpace(keyword))
                 return ApiResponse<List<TrafficSignDto>>.ErrorResponse("Keyword is required");
 
-            var signsEnumerable = await _unitOfWork.TrafficSigns.GetListAsync(
-                filter: s => (s.SignName.Contains(keyword) || s.SignCode.Contains(keyword)) && s.IsActive);
+            // OPTIMIZED: Filter at database level
+            var signs = await _unitOfWork.TrafficSigns.GetListAsync(
+                filter: s => (s.SignName.Contains(keyword) || s.SignCode.Contains(keyword)) && s.IsActive,
+                orderBy: q => q.OrderBy(s => s.SignCode)
+             );
 
-            var signs = signsEnumerable
-                .OrderBy(s => s.SignCode)
-                .Select(s => new TrafficSignDto
+            // OPTIMIZED: Map directly
+            var signDtos = signs.Select(s => new TrafficSignDto
                 {
                     SignId = s.SignId,
                     SignCode = s.SignCode,
@@ -148,10 +151,9 @@ public class TrafficSignService : ITrafficSignService
                     Meaning = s.Meaning,
                     RelatedQuestionCount = s.RelatedQuestionCount,
                     IsActive = s.IsActive
-                })
-                .ToList();
+                }).ToList();
 
-            return ApiResponse<List<TrafficSignDto>>.SuccessResponse(signs);
+            return ApiResponse<List<TrafficSignDto>>.SuccessResponse(signDtos);
         }
         catch (Exception ex)
         {

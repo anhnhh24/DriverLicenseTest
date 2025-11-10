@@ -259,7 +259,7 @@ public partial class DriverLicenseTestContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.UserWrongQuestions)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__UserWrong__UserI__11158940");
-        });
+        });;
 
         OnModelCreatingPartial(modelBuilder);
     }

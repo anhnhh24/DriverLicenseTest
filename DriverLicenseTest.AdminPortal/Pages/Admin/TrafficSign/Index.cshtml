@@ -1,0 +1,143 @@
+﻿@page
+@model AdminApp.Pages.Admin.TrafficSigns.IndexModel
+@{
+    ViewData["Title"] = "Quản Lý Biển Báo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Quản Lý Biển Báo Giao Thông</h2>
+        <a asp-page="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm Biển Báo Mới
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="searchString" value="@Model.SearchString" 
+                               class="form-control" placeholder="Tìm kiếm biển báo...">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="signType" class="form-select">
+                            <option value="">-- Tất cả loại --</option>
+                            <option value="Prohibitive" selected="@(Model.SignType == "Prohibitive")">Biển cấm</option>
+                            <option value="Warning" selected="@(Model.SignType == "Warning")">Biển cảnh báo</option>
+                            <option value="Mandatory" selected="@(Model.SignType == "Mandatory")">Biển hiệu lệnh</option>
+                            <option value="Information" selected="@(Model.SignType == "Information")">Biển chỉ dẫn</option>
+                            <option value="Additional" selected="@(Model.SignType == "Additional")">Biển phụ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="isActive" class="form-select">
+                            <option value="">-- Trạng thái --</option>
+                            <option value="true" selected="@(Model.IsActive == true)">Hoạt động</option>
+                            <option value="false" selected="@(Model.IsActive == false)">Không hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Lọc
+                        </button>
+                        <a asp-page="Index" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Traffic Signs Grid -->
+    <div class="row">
+        @foreach (var sign in Model.TrafficSigns)
+        {
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-header text-center">
+                        <h6 class="mb-0">@sign.SignCode</h6>
+                    </div>
+                    @if (!string.IsNullOrEmpty(sign.ImageURL))
+                    {
+                        <img src="@sign.ImageURL" class="card-img-top" alt="@sign.SignName" 
+                             style="height: 200px; object-fit: contain; padding: 10px;">
+                    }
+                    else
+                    {
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light" 
+                             style="height: 200px;">
+                            <i class="fas fa-image fa-4x text-muted"></i>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <h6 class="card-title">@sign.SignName</h6>
+                        <p class="card-text small text-muted">@sign.SignTypeVietnamese</p>
+                        <p class="card-text small">@(sign.Description?.Length > 100 ? 
+                            sign.Description.Substring(0, 100) + "..." : sign.Description)</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge @(sign.IsActive ? "bg-success" : "bg-secondary")">
+                                @(sign.IsActive ? "Hoạt động" : "Ngưng")
+                            </span>
+                            <span class="badge bg-info">@sign.RelatedQuestionCount câu hỏi</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group w-100" role="group">
+                            <a asp-page="Edit" asp-route-id="@sign.SignId" 
+                               class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-page="Delete" asp-route-id="@sign.SignId" 
+                               class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.TrafficSigns.Any())
+    {
+        <div class="alert alert-info text-center">
+            Không tìm thấy biển báo nào.
+        </div>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-all-route-data="@Model.GetRouteData(Model.PageNumber - 1)">Trước</a>
+                </li>
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                        <a class="page-link" asp-all-route-data="@Model.GetRouteData(i)">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-all-route-data="@Model.GetRouteData(Model.PageNumber + 1)">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

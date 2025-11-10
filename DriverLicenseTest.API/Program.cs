@@ -60,7 +60,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IMockExamService, MockExamService>();
 builder.Services.AddScoped<ITrafficSignService, TrafficSignService>();
-
+builder.Services.AddScoped<IUserStatisticService, UserStatisticService>();
+builder.Services.AddScoped<IUserWrongQuestionService, UserWrongQuestionService>();
 // Email service DI
 builder.Services.AddScoped<IEmailService, EmailService>();
 

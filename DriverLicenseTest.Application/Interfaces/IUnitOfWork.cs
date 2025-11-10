@@ -8,6 +8,7 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<Question> Questions { get; }
     IGenericRepository<AnswerOption> AnswerOptions { get; }
     IGenericRepository<AspNetUser> Users { get; }
+    IGenericRepository<AspNetRole> Roles { get; }
     IGenericRepository<LicenseType> LicenseTypes { get; }
     IGenericRepository<LicenseQuestion> LicenseQuestions { get; }
     IGenericRepository<UserPractice> UserPractices { get; }
@@ -16,7 +17,7 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<UserWrongQuestion> UserWrongQuestions { get; }
     IGenericRepository<TrafficSign> TrafficSigns { get; }
     IGenericRepository<UserStatistic> UserStatistics { get; }
-
+    IGenericRepository<AspNetUserRole> UserRoles { get; }
 
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

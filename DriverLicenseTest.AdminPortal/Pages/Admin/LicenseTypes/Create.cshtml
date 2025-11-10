@@ -1,0 +1,109 @@
+﻿<!-- LicenseTypes/Create.cshtml -->
+@model AdminApp.Pages.Admin.LicenseTypes.CreateModel
+@{
+    ViewData["Title"] = "Thêm Loại Bằng Lái";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Thêm Loại Bằng Lái Mới</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="License.LicenseCode" class="form-label">
+                                        Mã Bằng <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="License.LicenseCode" class="form-control" 
+                                           placeholder="VD: A1, B2, C" />
+                                    <span asp-validation-for="License.LicenseCode" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="License.LicenseName" class="form-label">
+                                        Tên Bằng Lái <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="License.LicenseName" class="form-control" 
+                                           placeholder="VD: Bằng lái xe máy hạng A1" />
+                                    <span asp-validation-for="License.LicenseName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="License.VehicleType" class="form-label">
+                                Loại Phương Tiện
+                            </label>
+                            <input asp-for="License.VehicleType" class="form-control" 
+                                   placeholder="VD: Xe máy, Ô tô con, Ô tô tải" />
+                            <span asp-validation-for="License.VehicleType" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="License.TotalQuestions" class="form-label">
+                                        Tổng Số Câu Hỏi <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="License.TotalQuestions" type="number" class="form-control" />
+                                    <span asp-validation-for="License.TotalQuestions" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="License.TimeLimit" class="form-label">
+                                        Thời Gian (phút) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="License.TimeLimit" type="number" class="form-control" />
+                                    <span asp-validation-for="License.TimeLimit" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="License.PassingScore" class="form-label">
+                                        Điểm Đạt <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="License.PassingScore" type="number" class="form-control" />
+                                    <span asp-validation-for="License.PassingScore" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="License.RequiredElimination" class="form-label">
+                                Số Câu Điểm Liệt Cho Phép Sai
+                            </label>
+                            <input asp-for="License.RequiredElimination" type="number" class="form-control" />
+                            <span asp-validation-for="License.RequiredElimination" class="text-danger"></span>
+                            <small class="text-muted">Để trống hoặc 0 nếu không cho phép sai câu điểm liệt</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay Lại
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

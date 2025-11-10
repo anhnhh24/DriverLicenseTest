@@ -25,10 +25,11 @@ public class MockExamDto
     // Timing
     public DateTime StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
-    public int TimeSpent { get; set; } // seconds
+    public int TimeSpent { get; set; } 
+    public int TimeLimit { get; set; } 
 
     // Questions (for displaying)
-    public List<MockExamQuestionDto> Questions { get; set; } = new();
+    public List<MockExamQuestionDto>? Questions { get; set; } = new();
 
     // Metadata
     public DateTime CreatedAt { get; set; }
@@ -43,6 +44,7 @@ public class MockExamQuestionDto
     public string CategoryName { get; set; }
     public List<AnswerOptionDto> AnswerOptions { get; set; } = new();
     public int? SelectedOptionId { get; set; }
+    public string? ImageUrl { get; set; }
     public bool IsCorrect { get; set; }
 }
 

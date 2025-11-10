@@ -14,6 +14,7 @@ public class UnitOfWork : IUnitOfWork
     private IGenericRepository<Category>? _categories;
     private IGenericRepository<Question>? _questions;
     private IGenericRepository<AnswerOption>? _answerOptions;
+    private IGenericRepository<AspNetRole>? _roles;
     private IGenericRepository<AspNetUser>? _users;
     private IGenericRepository<LicenseType>? _licenseTypes;
     private IGenericRepository<LicenseQuestion>? _licenseQuestions;
@@ -23,12 +24,14 @@ public class UnitOfWork : IUnitOfWork
     private IGenericRepository<UserWrongQuestion> _userWrongQuestions;
     private IGenericRepository<TrafficSign> _trafficSign;
     private IGenericRepository<UserStatistic> _userStatistic;
-
-
+    private IGenericRepository<AspNetUserRole>? _userRoles;
+    
     public UnitOfWork(DriverLicenseTestContext context)
     {
         _context = context;
     }
+    public IGenericRepository<AspNetUserRole> UserRoles =>
+        _userRoles ??= new GenericRepository<AspNetUserRole>(_context);
 
     public IGenericRepository<Category> Categories
         => _categories ??= new GenericRepository<Category>(_context);
@@ -41,6 +44,8 @@ public class UnitOfWork : IUnitOfWork
 
     public IGenericRepository<AspNetUser> Users
         => _users ??= new GenericRepository<AspNetUser>(_context);
+    public IGenericRepository<AspNetRole> Roles
+       => _roles ??= new GenericRepository<AspNetRole>(_context);
 
     public IGenericRepository<LicenseType> LicenseTypes
         => _licenseTypes ??= new GenericRepository<LicenseType>(_context);

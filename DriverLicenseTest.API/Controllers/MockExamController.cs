@@ -50,11 +50,33 @@ public class MockExamsController : ControllerBase
     /// POST api/mockexams/{examId}/submit
     /// </summary>
     [HttpPost("{examId:int}/submit")]
-    public async Task<IActionResult> SubmitMockExam(int examId)
+    public async Task<ApiResponse<MockExamDto>> SubmitMockExam([FromRoute] int examId, [FromBody] SubmitExamRequest request)
     {
-        var result = await _mockExamService.SubmitMockExamAsync(examId);
-        return result.Success ? Ok(result) : BadRequest(result);
+        if (examId != request.ExamId)
+        {
+            return new ApiResponse<MockExamDto>
+            {
+                Data = null,
+                Success = false,
+                Message = "Mã bài thi không khớp giữa đường dẫn và nội dung yêu cầu."
+            };
+        }
+        try
+        {
+            var resultExam = await _mockExamService.SubmitMockExamAsync(examId ,request);
+
+            return resultExam;
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<MockExamDto>
+            {
+                Data = null,
+                Success = false,
+                Message = "Đã xảy ra lỗi khi nộp bài thi: " + ex.Message
+            };
     }
+}
 
     [HttpGet("byuser")]
     public async Task<IActionResult> GetMockExamByUserIdAndLicenseType([FromQuery] string userId, [FromQuery] int licenseType)
@@ -63,5 +85,13 @@ public class MockExamsController : ControllerBase
             return BadRequest(ApiResponse<MockExamDto>.ErrorResponse("userId and licenseType are required"));
         var result = await _mockExamService.GetMockExamAsyncByUserIdAnfLicenseType(userId, licenseType);
         return result.Success ? Ok(result) : NotFound(result);
+    }
+    [HttpPut("update/{examId}")]
+    public async Task<IActionResult> UpdateMockExam(int examId, [FromQuery] string userId, [FromBody] MockExamDto updateDto)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+            return BadRequest(ApiResponse<MockExamDto>.ErrorResponse("userId is required"));
+        var result = await _mockExamService.UpdateMockExamAsync(examId, userId, updateDto);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 }

@@ -2,6 +2,7 @@
 using DriverLicenseTest.Application.Interfaces;
 using DriverLicenseTest.Application.Services.Interfaces;
 using DriverLicenseTest.Domain.Entities;
+using DriverLicenseTest.Shared.DTOs;
 using DriverLicenseTest.Shared.DTOs.Common;
 using DriverLicenseTest.Shared.DTOs.Question;
 using Microsoft.EntityFrameworkCore;
@@ -166,146 +167,153 @@ public class QuestionService : IQuestionService
     }
 
     /// <summary>
-    /// Get all questions with pagination
+    /// Get all questions with pagination - OPTIMIZED
     /// </summary>
     public async Task<ApiResponse<PagedResult<QuestionDto>>> GetQuestionsAsync(int pageNumber, int pageSize)
     {
         try
         {
             pageNumber = Math.Max(1, pageNumber);
-            pageSize = Math.Max(1, Math.Min(pageSize, 100)); // Max 100 per page
+    pageSize = Math.Max(1, Math.Min(pageSize, 100)); // Max 100 per page
 
-            // ✅ FIX: Use GetListAsync instead of GetCount()
-            var questions = await _unitOfWork.Questions.GetListAsync(
-                orderBy: q => q.OrderBy(x => x.QuestionNumber),
-                include: q => q.Include(c => c.AnswerOptions).Include(c => c.Category),
-                pageSize: pageSize,
-                pageNumber: pageNumber
-            );
+   // Get total count first - NO INCLUDE needed for count
+var totalCount = await _unitOfWork.Questions.GetCount();
 
-            var totalCount = questions.Count();
-            var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
+            // Get paginated questions - ONLY include Category (no AnswerOptions for list view)
+   var questions = await _unitOfWork.Questions.GetListAsync(
+           orderBy: q => q.OrderBy(x => x.QuestionNumber),
+    include: q => q.Include(c => c.Category), // Only Category needed for list
+  pageSize: pageSize,
+         pageNumber: pageNumber
+     );
 
-            var pagedResult = new PagedResult<QuestionDto>
-            {
+     var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
+
+       var pagedResult = new PagedResult<QuestionDto>
+      {
                 Items = questionDtos,
                 TotalCount = totalCount,
-                PageNumber = pageNumber,
+    PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize) // ✅ FIX: Calculate TotalPages
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
             };
 
             return ApiResponse<PagedResult<QuestionDto>>.SuccessResponse(pagedResult);
-        }
+   }
         catch (Exception ex)
-        {
+ {
             return ApiResponse<PagedResult<QuestionDto>>.ErrorResponse($"Error: {ex.Message}");
         }
     }
 
     /// <summary>
-    /// Get questions by category with pagination
+    /// Get questions by category with pagination - OPTIMIZED
     /// </summary>
     public async Task<ApiResponse<PagedResult<QuestionDto>>> GetQuestionsByCategoryAsync(
         int categoryId, int pageNumber, int pageSize)
     {
         try
-        {
-            pageNumber = Math.Max(1, pageNumber);
+     {
+   pageNumber = Math.Max(1, pageNumber);
             pageSize = Math.Max(1, Math.Min(pageSize, 100));
 
-            // ✅ FIX: Use GetListAsync with filter
-            var questions = await _unitOfWork.Questions.GetListAsync(
-                filter: q => q.CategoryId == categoryId,
-                orderBy: q => q.OrderBy(x => x.QuestionNumber),
-                include: q => q.Include(c => c.Category).Include(c => c.AnswerOptions),
-                pageSize: pageSize,
-                pageNumber: pageNumber
-            );
+      // Get total count for this category first
+    var totalCount = await _unitOfWork.Questions.GetCount(q => q.CategoryId == categoryId);
 
-            var totalCount = questions.Count();
-            var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
+            // Get paginated questions - ONLY include Category
+      var questions = await _unitOfWork.Questions.GetListAsync(
+       filter: q => q.CategoryId == categoryId,
+       orderBy: q => q.OrderBy(x => x.QuestionNumber),
+     include: q => q.Include(c => c.Category), // Only Category needed
+        pageSize: pageSize,
+           pageNumber: pageNumber
+     );
 
-            var pagedResult = new PagedResult<QuestionDto>
-            {
-                Items = questionDtos,
-                TotalCount = totalCount,
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize) // ✅ FIX: Calculate TotalPages
+ var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
+
+       var pagedResult = new PagedResult<QuestionDto>
+          {
+         Items = questionDtos,
+   TotalCount = totalCount,
+    PageNumber = pageNumber,
+            PageSize = pageSize,
+  TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
             };
 
-            return ApiResponse<PagedResult<QuestionDto>>.SuccessResponse(pagedResult);
-        }
-        catch (Exception ex)
+         return ApiResponse<PagedResult<QuestionDto>>.SuccessResponse(pagedResult);
+      }
+      catch (Exception ex)
         {
-            return ApiResponse<PagedResult<QuestionDto>>.ErrorResponse($"Error: {ex.Message}");
+      return ApiResponse<PagedResult<QuestionDto>>.ErrorResponse($"Error: {ex.Message}");
         }
     }
 
-
     /// <summary>
-    /// Get elimination questions (điểm liệt)
+    /// Get elimination questions (điểm liệt) - OPTIMIZED
     /// </summary>
     public async Task<ApiResponse<PagedResult<QuestionDto>>> GetEliminationQuestionsAsync(
-        int pageNumber = 1, int pageSize = 20)
+  int pageNumber = 1, int pageSize = 20)
     {
-        try
+ try
         {
             pageNumber = Math.Max(1, pageNumber);
-            pageSize = Math.Max(1, Math.Min(pageSize, 100));
+      pageSize = Math.Max(1, Math.Min(pageSize, 100));
 
-            var questions = await _unitOfWork.Questions.GetListAsync(
-                filter: q => q.IsElimination == true,
-                orderBy: q => q.OrderBy(x => x.QuestionNumber),
-                include: q => q.Include(c => c.AnswerOptions),
-                pageSize: pageSize,
+      // Get total count for elimination questions first
+    var totalCount = await _unitOfWork.Questions.GetCount(q => q.IsElimination == true);
+
+    // Get paginated questions - NO AnswerOptions for list view
+         var questions = await _unitOfWork.Questions.GetListAsync(
+   filter: q => q.IsElimination == true,
+              orderBy: q => q.OrderBy(x => x.QuestionNumber),
+                include: q => q.Include(c => c.Category), // Add Category for display
+     pageSize: pageSize,
                 pageNumber: pageNumber
             );
 
-            var totalCount = questions.Count();
             var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
 
-            var pagedResult = new PagedResult<QuestionDto>
-            {
-                Items = questionDtos,
-                TotalCount = totalCount,
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize) // ✅ FIX: Calculate TotalPages
-            };
+  var pagedResult = new PagedResult<QuestionDto>
+     {
+           Items = questionDtos,
+   TotalCount = totalCount,
+     PageNumber = pageNumber,
+           PageSize = pageSize,
+    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+    };
 
-            return ApiResponse<PagedResult<QuestionDto>>.SuccessResponse(pagedResult);
+return ApiResponse<PagedResult<QuestionDto>>.SuccessResponse(pagedResult);
         }
-        catch (Exception ex)
+      catch (Exception ex)
         {
             return ApiResponse<PagedResult<QuestionDto>>.ErrorResponse($"Error: {ex.Message}");
         }
     }
 
     /// <summary>
-    /// Search questions by keyword
-    /// </summary>
+    /// Search questions by keyword - OPTIMIZED
+/// </summary>
     public async Task<ApiResponse<List<QuestionDto>>> SearchQuestionsAsync(string keyword)
     {
         try
-        {
+    {
             if (string.IsNullOrWhiteSpace(keyword))
-                return ApiResponse<List<QuestionDto>>.ErrorResponse("Keyword cannot be empty");
+     return ApiResponse<List<QuestionDto>>.ErrorResponse("Keyword cannot be empty");
 
+            // Only include Category, no AnswerOptions for search results
             var questions = await _unitOfWork.Questions.GetListAsync(
-                filter: q => q.QuestionText.Contains(keyword) ||
-                            (q.ExplanationText != null && q.ExplanationText.Contains(keyword)),
-                orderBy: q => q.OrderBy(x => x.QuestionNumber),
-                include: q => q.Include(x => x.AnswerOptions)
+  filter: q => q.QuestionText.Contains(keyword) ||
+      (q.ExplanationText != null && q.ExplanationText.Contains(keyword)),
+    orderBy: q => q.OrderBy(x => x.QuestionNumber),
+include: q => q.Include(x => x.Category) // Only Category needed
             );
 
-            var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
+          var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
             return ApiResponse<List<QuestionDto>>.SuccessResponse(questionDtos);
         }
         catch (Exception ex)
         {
-            return ApiResponse<List<QuestionDto>>.ErrorResponse($"Error: {ex.Message}");
+  return ApiResponse<List<QuestionDto>>.ErrorResponse($"Error: {ex.Message}");
         }
     }
 
@@ -326,7 +334,6 @@ public class QuestionService : IQuestionService
             // Create question
             var question = new Question
             {
-                QuestionNumber = dto.QuestionNumber,
                 CategoryId = dto.CategoryId,
                 QuestionText = dto.QuestionText,
                 ExplanationText = dto.ExplanationText,

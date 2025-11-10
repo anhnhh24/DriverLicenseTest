@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DriverLicenseTest.Shared.DTOs.Question;
+namespace DriverLicenseTest.Shared.DTOs;
 
 public class CreateQuestionDto
 {
@@ -11,28 +11,17 @@ public class CreateQuestionDto
     public int CategoryId { get; set; }
 
     [Required]
-    [StringLength(1000)]
     public string QuestionText { get; set; } = string.Empty;
 
     public string? ExplanationText { get; set; }
 
-    [StringLength(20)]
-    public string DifficultyLevel { get; set; } = "Medium";
+    public string? DifficultyLevel { get; set; }
 
     public bool IsElimination { get; set; }
 
-    [Url]
-    [StringLength(500)]
-    public string? ImageURL { get; set; }
-
-    [Range(10, 300)]
-    public int TimeLimit { get; set; } = 30;
-
-    [Range(1, 10)]
-    public int Points { get; set; } = 1;
+    public int TimeLimit { get; set; }
 
     [Required]
-    [MinLength(2)]
     public List<CreateAnswerOptionDto> AnswerOptions { get; set; } = new();
 }
 

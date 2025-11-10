@@ -20,7 +20,7 @@ public partial class MockExam
     public int WrongAnswers { get; set; }
 
     public int? TimeSpent { get; set; }
-
+    public int? TimeLimit { get; set; }
     public string PassStatus { get; set; } = null!;
 
     public bool? FailedElimination { get; set; }

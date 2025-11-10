@@ -7,6 +7,7 @@ public interface IMockExamService
 {
     Task<ApiResponse<MockExamDto>> StartMockExamAsync(string userId, string licenseType);
     Task<ApiResponse<MockExamDto>> GetMockExamAsync(int examId);
-    Task<ApiResponse<MockExamDto>> SubmitMockExamAsync(int examId);
+    Task<ApiResponse<MockExamDto>> SubmitMockExamAsync(int examId, SubmitExamRequest request);
+    Task<ApiResponse<MockExamDto>> UpdateMockExamAsync(int examId, string userId, MockExamDto updateDto);
     Task<ApiResponse<IEnumerable<MockExamDto>>> GetMockExamAsyncByUserIdAnfLicenseType(string userId, int licenseTypeId);
 }

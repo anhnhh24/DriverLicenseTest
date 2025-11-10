@@ -167,7 +167,8 @@ namespace Infrastructure.Repository
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null)
         {
-            IQueryable<T> query = _context.Set<T>();
+            // OPTIMIZED: Add AsNoTracking for read-only queries
+            IQueryable<T> query = _context.Set<T>().AsNoTracking();
 
             if (include != null)
             {
@@ -194,7 +195,8 @@ namespace Infrastructure.Repository
             int? pageSize = null,
             int? pageNumber = null)
         {
-            IQueryable<T> query = _context.Set<T>();
+            // OPTIMIZED: Add AsNoTracking for read-only queries
+            IQueryable<T> query = _context.Set<T>().AsNoTracking();
 
             if (include != null)
             {

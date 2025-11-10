@@ -1,4 +1,5 @@
-﻿using DriverLicenseTest.Shared.DTOs.Common;
+﻿using DriverLicenseTest.Shared.DTOs;
+using DriverLicenseTest.Shared.DTOs.Common;
 using DriverLicenseTest.Shared.DTOs.Question;
 
 namespace DriverLicenseTest.Application.Services.Interfaces;
